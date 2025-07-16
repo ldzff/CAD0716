@@ -3969,22 +3969,34 @@ namespace RobTeach.Views
 
         private void WritePointData(StreamWriter writer, DxfPoint point, ref int address, float rx = 0f, float ry = 0f, float rz = 0f)
         {
-            writer.WriteLine($"{((float)point.X).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Y).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Z).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{rx.ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{ry.ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{rz.ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.X).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Y).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Z).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{rx.ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{ry.ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{rz.ToString("F3")}  (Address: {address})");
+            address += 2;
         }
 
         private void WriteTrajectoryPointWithAnglesData(StreamWriter writer, TrajectoryPointWithAngles point, ref int address)
         {
-            writer.WriteLine($"{((float)point.Coordinates.X).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Coordinates.Y).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Coordinates.Z).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Rx).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Ry).ToString("F3")}  (Address: {address})"); address += 2;
-            writer.WriteLine($"{((float)point.Rz).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Coordinates.X).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Coordinates.Y).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Coordinates.Z).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Rx).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Ry).ToString("F3")}  (Address: {address})");
+            address += 2;
+            writer.WriteLine($"{((float)point.Rz).ToString("F3")}  (Address: {address})");
+            address += 2;
         }
 
 
