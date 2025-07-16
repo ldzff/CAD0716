@@ -113,7 +113,28 @@ namespace RobTeach.Services
             dataQueue.Enqueue((float)currentPass.Trajectories.Count);
             foreach (var trajectory in currentPass.Trajectories)
             {
-                // ... (populate queue with trajectory data as in WriteSendDataToTempFile)
+                dataQueue.Enqueue((float)trajectory.Points.Count);
+                foreach (var point in trajectory.Points)
+                {
+                    dataQueue.Enqueue((float)point.X);
+                    dataQueue.Enqueue((float)point.Y);
+                    dataQueue.Enqueue((float)point.Z);
+                    dataQueue.Enqueue(0f); // Rx
+                    dataQueue.Enqueue(0f); // Ry
+                    dataQueue.Enqueue(0f); // Rz
+                }
+                dataQueue.Enqueue(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f);
+                dataQueue.Enqueue(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f);
+                dataQueue.Enqueue(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f);
+                dataQueue.Enqueue(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f);
+                double lengthInMeters = TrajectoryUtils.CalculateTrajectoryLength(trajectory);
+                double currentRuntime = trajectory.Runtime;
+                float speedForRobot = 0.0f;
+                if (lengthInMeters > 0.00001 && currentRuntime > 0.00001)
+                {
+                    speedForRobot = (float)(lengthInMeters / currentRuntime);
+                }
+                dataQueue.Enqueue(speedForRobot);
             }
 
             try
