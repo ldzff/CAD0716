@@ -119,15 +119,15 @@ namespace RobTeach.Services
             try
             {
                 int currentAddress = 4000;
-                var registers = new List<int>();
+                var floatList = new List<float>();
                 while(dataQueue.Count > 0)
                 {
-                    float data = dataQueue.Dequeue();
-                    registers.AddRange(ModbusClient.ConvertFloatToRegisters(data));
+                    floatList.Add(dataQueue.Dequeue());
                 }
-                if (registers.Count > 0)
+
+                if (floatList.Count > 0)
                 {
-                    modbusClient.WriteMultipleRegisters(currentAddress, registers.ToArray());
+                    modbusClient.WriteMultipleRegisters(currentAddress, ModbusClient.ConvertFloatToRegisters(floatList.ToArray()));
                 }
 
                 return ModbusResponse.Ok($"Successfully sent configuration to Modbus server.");
