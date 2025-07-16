@@ -23,12 +23,12 @@ namespace RobTeach.Services
 
         // Define Modbus register addresses based on the application's README or device specification.
         // These constants define the memory map on the Modbus server (robot).
-        private const int TrajectoryCountRegister = 3000;   // Register to write the number of trajectories being sent.
-        private const int BasePointsCountRegister = 3001;   // Base register for the point count of the first trajectory.
-        private const int BaseXCoordsRegister = 3002;       // Base register for X coordinates of the first trajectory.
-        private const int BaseYCoordsRegister = 3052;       // Base register for Y coordinates of the first trajectory.
-        private const int BaseNozzleNumRegister = 3102;     // Base register for nozzle number of the first trajectory.
-        private const int BaseSprayTypeRegister = 3103;     // Base register for spray type of the first trajectory.
+        private const int TrajectoryCountRegister = 4000;   // Register to write the number of trajectories being sent.
+        private const int BasePointsCountRegister = 4001;   // Base register for the point count of the first trajectory.
+        private const int BaseXCoordsRegister = 4002;       // Base register for X coordinates of the first trajectory.
+        private const int BaseYCoordsRegister = 4052;       // Base register for Y coordinates of the first trajectory.
+        private const int BaseNozzleNumRegister = 4102;     // Base register for nozzle number of the first trajectory.
+        private const int BaseSprayTypeRegister = 4103;     // Base register for spray type of the first trajectory.
 
         private const int TrajectoryRegisterOffset = 100;   // Offset between base registers of consecutive trajectories.
         private const int MaxPointsPerTrajectory = 50;      // Maximum number of points per trajectory supported by the robot.
@@ -150,17 +150,16 @@ namespace RobTeach.Services
 
                     if (pointsInCurrentTraj > 0)
                     {
-                        // Convert trajectory points (doubles) to integers for Modbus registers.
-                        // This assumes the robot expects integer coordinates. Scaling might be needed if units differ (e.g., mm vs 0.1mm).
-                        int[] xCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (int)Math.Round(p.X)).ToArray();
-                        int[] yCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (int)Math.Round(p.Y)).ToArray();
+                    // Convert trajectory points (doubles) to floats and then to integer arrays for Modbus registers.
+                    float[] xCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (float)p.X).ToArray();
+                    float[] yCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (float)p.Y).ToArray();
 
                         // Calculate base registers for X and Y coordinates of the current trajectory.
                         int currentTrajBaseXReg = BaseXCoordsRegister + (i * TrajectoryRegisterOffset);
-                        modbusClient.WriteMultipleRegisters(currentTrajBaseXReg, xCoords);
+                    modbusClient.WriteMultipleRegisters(currentTrajBaseXReg, ModbusClient.ConvertFloatToRegisters(xCoords));
 
                         int currentTrajBaseYReg = BaseYCoordsRegister + (i * TrajectoryRegisterOffset);
-                        modbusClient.WriteMultipleRegisters(currentTrajBaseYReg, yCoords);
+                    modbusClient.WriteMultipleRegisters(currentTrajBaseYReg, ModbusClient.ConvertFloatToRegisters(yCoords));
                     }
 
                     // Write nozzle number for the current trajectory.
