@@ -203,8 +203,112 @@ namespace RobTeach.Views
             RefreshCurrentPassTrajectoriesListBox();
             UpdateSelectedTrajectoryDetailUI(); // Initial call (renamed)
             RefreshCadCanvasHighlights(); // Initial call for canvas highlights
+            LanguageComboBox.SelectionChanged += LanguageComboBox_SelectionChanged;
         }
-
+        private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LanguageComboBox.SelectedItem is ComboBoxItem selectedItem)
+            {
+                string language = selectedItem.Content.ToString();
+                _currentConfiguration.Language = language;
+                UpdateUIText(language);
+            }
+        }
+        private void UpdateUIText(string language)
+        {
+            if (language == "中文")
+            {
+                Title = "机器人示教应用";
+                LoadDxfButton.Content = "加载DXF";
+                SaveConfigButton.Content = "保存配置";
+                LoadConfigButton.Content = "加载配置";
+                FitToViewButton.Content = "适应视图";
+                Show3DViewButton.Content = "显示3D视图";
+                SprayPassManagementGroupBox.Header = "喷涂遍数管理";
+                AvailablePassesLabel.Content = "可用遍数:";
+                AddPassButton.Content = "添加遍数";
+                RemovePassButton.Content = "移除遍数";
+                RenamePassButton.Content = "重命名遍数";
+                TrajectorySequenceGroupBox.Header = "轨迹顺序（当前遍数）";
+                ExecutionOrderLabel.Content = "执行顺序:";
+                MoveTrajectoryUpButton.Content = "上移";
+                MoveTrajectoryDownButton.Content = "下移";
+                NozzleSettingsGroupBox.Header = "选定轨迹 - 喷嘴设置";
+                UpperNozzleGroupBox.Header = "上喷嘴";
+                TrajectoryUpperNozzleGasOnCheckBox.Content = "气体开启";
+                TrajectoryUpperNozzleLiquidOnCheckBox.Content = "液体开启";
+                LowerNozzleGroupBox.Header = "下喷嘴";
+                TrajectoryLowerNozzleGasOnCheckBox.Content = "气体开启";
+                TrajectoryLowerNozzleLiquidOnCheckBox.Content = "液体开启";
+                GeometryGroupBox.Header = "选定轨迹 - 几何形状";
+                TrajectoryIsReversedCheckBox.Content = "反转方向";
+                LineStartZLabel.Content = "起点Z:";
+                LineEndZLabel.Content = "终点Z:";
+                ArcCenterZLabel.Content = "圆心Z:";
+                CircleCenterZLabel.Content = "圆心Z:";
+                PolygonZLabel.Content = "Z:";
+                TrajectoryRuntimeLabel.Content = "运行时间 (s):";
+                PolygonVerticesGroupBox.Header = "顶点";
+                TestRunControlGroupBox.Header = "测试运行控制";
+                SpeedModeLabel.Content = "速度模式:";
+                SlowSpeedRadioButton.Content = "慢速";
+                StandardSpeedRadioButton.Content = "标准速度";
+                StartTestRunButton.Content = "开始测试运行";
+                ModbusIpLabel.Content = "Modbus IP:";
+                ModbusPortLabel.Content = "端口:";
+                ModbusConnectButton.Content = "连接";
+                ModbusDisconnectButton.Content = "断开";
+                SendToRobotButton.Content = "发送到机器人";
+                ModbusStatusTextBlock.Text = "已断开";
+                StatusTextBlock.Text = "就绪";
+            }
+            else
+            {
+                Title = "RobTeach Application";
+                LoadDxfButton.Content = "Load DXF";
+                SaveConfigButton.Content = "Save Config";
+                LoadConfigButton.Content = "Load Config";
+                FitToViewButton.Content = "Fit to View";
+                Show3DViewButton.Content = "Show 3D View";
+                SprayPassManagementGroupBox.Header = "Spray Pass Management";
+                AvailablePassesLabel.Content = "Available Passes:";
+                AddPassButton.Content = "Add Pass";
+                RemovePassButton.Content = "Remove Pass";
+                RenamePassButton.Content = "Rename Pass";
+                TrajectorySequenceGroupBox.Header = "Trajectory Sequence (Current Pass)";
+                ExecutionOrderLabel.Content = "Execution Order:";
+                MoveTrajectoryUpButton.Content = "Move Up";
+                MoveTrajectoryDownButton.Content = "Move Down";
+                NozzleSettingsGroupBox.Header = "Selected Trajectory - Nozzle Settings";
+                UpperNozzleGroupBox.Header = "Upper Nozzle";
+                TrajectoryUpperNozzleGasOnCheckBox.Content = "Gas On";
+                TrajectoryUpperNozzleLiquidOnCheckBox.Content = "Liquid On";
+                LowerNozzleGroupBox.Header = "Lower Nozzle";
+                TrajectoryLowerNozzleGasOnCheckBox.Content = "Gas On";
+                TrajectoryLowerNozzleLiquidOnCheckBox.Content = "Liquid On";
+                GeometryGroupBox.Header = "Selected Trajectory - Geometry";
+                TrajectoryIsReversedCheckBox.Content = "Reverse Direction";
+                LineStartZLabel.Content = "Start Z:";
+                LineEndZLabel.Content = "End Z:";
+                ArcCenterZLabel.Content = "Center Z:";
+                CircleCenterZLabel.Content = "Center Z:";
+                PolygonZLabel.Content = "Z:";
+                TrajectoryRuntimeLabel.Content = "Runtime (s):";
+                PolygonVerticesGroupBox.Header = "Vertices";
+                TestRunControlGroupBox.Header = "Test Run Control";
+                SpeedModeLabel.Content = "Speed Mode:";
+                SlowSpeedRadioButton.Content = "Slow Speed";
+                StandardSpeedRadioButton.Content = "Standard Speed";
+                StartTestRunButton.Content = "Start Test Run";
+                ModbusIpLabel.Content = "Modbus IP:";
+                ModbusPortLabel.Content = "Port:";
+                ModbusConnectButton.Content = "Connect";
+                ModbusDisconnectButton.Content = "Disconnect";
+                SendToRobotButton.Content = "Send to Robot";
+                ModbusStatusTextBlock.Text = "Disconnected";
+                StatusTextBlock.Text = "Ready";
+            }
+        }
         // Removed UpperNozzleOnCheckBox_Changed and LowerNozzleOnCheckBox_Changed
 
         private void RefreshCadCanvasHighlights()
@@ -2191,6 +2295,15 @@ namespace RobTeach.Views
                     }
 
                     ProductNameTextBox.Text = _currentConfiguration.ProductName;
+                    if (_currentConfiguration.Language == "中文")
+                    {
+                        LanguageComboBox.SelectedIndex = 1;
+                    }
+                    else
+                    {
+                        LanguageComboBox.SelectedIndex = 0;
+                    }
+                    UpdateUIText(_currentConfiguration.Language);
 
                     // Restore Modbus Settings
                     ModbusIpAddressTextBox.Text = _currentConfiguration.ModbusIpAddress;

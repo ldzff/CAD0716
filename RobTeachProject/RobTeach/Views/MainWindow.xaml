@@ -33,7 +33,11 @@
             <Button Content="Save Config" Name="SaveConfigButton" Click="SaveConfigButton_Click" Padding="5" Margin="0,0,5,0"/>
             <Button Content="Load Config" Name="LoadConfigButton" Click="LoadConfigButton_Click" Padding="5" Margin="0,0,5,0"/>
             <Button Content="Fit to View" Click="FitToViewButton_Click" Name="FitToViewButton" Padding="5" Margin="0,0,5,0"/>
-            <Button Content="Show 3D View" Name="Show3DViewButton" Click="Show3DViewButton_Click" Padding="5" Margin="0,0,0,0"/>
+            <Button Content="Show 3D View" Name="Show3DViewButton" Click="Show3DViewButton_Click" Padding="5" Margin="0,0,5,0"/>
+            <ComboBox Name="LanguageComboBox" Width="100" Margin="5,0,0,0" VerticalAlignment="Center">
+                <ComboBoxItem Content="English"/>
+                <ComboBoxItem Content="中文"/>
+            </ComboBox>
         </StackPanel>
 
         <!-- CAD Canvas Area -->
@@ -51,9 +55,9 @@
                 <Label Content="Product:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                 <TextBox Name="ProductNameTextBox" Width="120" VerticalAlignment="Center" Margin="0,0,5,0" Text="DefaultProduct"/>
 
-                <GroupBox Header="Spray Pass Management" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
+                <GroupBox x:Name="SprayPassManagementGroupBox" Header="Spray Pass Management" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                     <StackPanel Orientation="Vertical">
-                        <Label Content="Available Passes:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
+                        <Label x:Name="AvailablePassesLabel" Content="Available Passes:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                         <ListBox Name="SprayPassesListBox" Height="60" Margin="2" DisplayMemberPath="PassName"/>
                         <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                             <Button Name="AddPassButton" Content="Add Pass" Margin="2,0"/>
@@ -63,9 +67,9 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Trajectory Sequence (Current Pass)" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
+                <GroupBox x:Name="TrajectorySequenceGroupBox" Header="Trajectory Sequence (Current Pass)" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                     <StackPanel Orientation="Vertical">
-                        <Label Content="Execution Order:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
+                        <Label x:Name="ExecutionOrderLabel" Content="Execution Order:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                         <ListBox Name="CurrentPassTrajectoriesListBox" Height="100" Margin="2"/>
                         <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                             <Button Name="MoveTrajectoryUpButton" Content="Move Up" Margin="2,0"/>
@@ -74,16 +78,16 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Selected Trajectory - Nozzle Settings" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
+                <GroupBox x:Name="NozzleSettingsGroupBox" Header="Selected Trajectory - Nozzle Settings" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                     <StackPanel Orientation="Vertical">
-                        <GroupBox Header="Upper Nozzle" Margin="2" Padding="3" Foreground="{StaticResource DefaultTextBrush}">
+                        <GroupBox x:Name="UpperNozzleGroupBox" Header="Upper Nozzle" Margin="2" Padding="3" Foreground="{StaticResource DefaultTextBrush}">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Name="TrajectoryUpperNozzleEnabledCheckBox" Content="Enabled" Margin="1" Foreground="{StaticResource DefaultTextBrush}" Visibility="Collapsed"/>
                                 <CheckBox Name="TrajectoryUpperNozzleGasOnCheckBox" Content="Gas On" Margin="1" Foreground="{StaticResource DefaultTextBrush}"/>
                                 <CheckBox Name="TrajectoryUpperNozzleLiquidOnCheckBox" Content="Liquid On" Margin="1" Foreground="{StaticResource DefaultTextBrush}"/>
                             </StackPanel>
                         </GroupBox>
-                        <GroupBox Header="Lower Nozzle" Margin="2" Padding="3" Foreground="{StaticResource DefaultTextBrush}">
+                        <GroupBox x:Name="LowerNozzleGroupBox" Header="Lower Nozzle" Margin="2" Padding="3" Foreground="{StaticResource DefaultTextBrush}">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Name="TrajectoryLowerNozzleEnabledCheckBox" Content="Enabled" Margin="1" Foreground="{StaticResource DefaultTextBrush}" Visibility="Collapsed"/>
                                 <CheckBox Name="TrajectoryLowerNozzleGasOnCheckBox" Content="Gas On" Margin="1" Foreground="{StaticResource DefaultTextBrush}"/>
@@ -93,29 +97,29 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Selected Trajectory - Geometry" Margin="5,0,0,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
+                <GroupBox x:Name="GeometryGroupBox" Header="Selected Trajectory - Geometry" Margin="5,0,0,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                     <StackPanel Orientation="Vertical">
                         <CheckBox Name="TrajectoryIsReversedCheckBox" Content="Reverse Direction" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                         <StackPanel Name="LineHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                            <Label Content="Start Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="LineStartZLabel" Content="Start Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="LineStartZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineStartZTextBox_TextChanged"/>
-                            <Label Content="End Z:" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="LineEndZLabel" Content="End Z:" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="LineEndZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineEndZTextBox_TextChanged"/>
                         </StackPanel>
                         <StackPanel Name="ArcHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                            <Label Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="ArcCenterZLabel" Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="ArcCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="ArcCenterZTextBox_TextChanged"/>
                         </StackPanel>
                         <StackPanel Name="CircleHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                            <Label Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="CircleCenterZLabel" Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="CircleCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="CircleCenterZTextBox_TextChanged"/>
                         </StackPanel>
                         <StackPanel Name="PolygonHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                            <Label Content="Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="PolygonZLabel" Content="Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="PolygonZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="PolygonZTextBox_TextChanged"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="2">
-                            <Label Content="Runtime (s):" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="TrajectoryRuntimeLabel" Content="Runtime (s):" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <TextBox Name="TrajectoryRuntimeTextBox" Width="60" VerticalAlignment="Center" Margin="2,0"/>
                         </StackPanel>
                         <GroupBox Header="Vertices" Margin="2" Padding="3" Foreground="{StaticResource DefaultTextBrush}" Name="PolygonVerticesGroupBox" Visibility="Collapsed">
@@ -125,10 +129,10 @@
                 </GroupBox>
 
                 <!-- New Test Run Control GroupBox -->
-                <GroupBox Header="Test Run Control" Margin="5,0,0,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
+                <GroupBox x:Name="TestRunControlGroupBox" Header="Test Run Control" Margin="5,0,0,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <Label Content="Speed Mode:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+                            <Label x:Name="SpeedModeLabel" Content="Speed Mode:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                             <RadioButton Name="SlowSpeedRadioButton" Content="Slow Speed" GroupName="TestRunSpeedMode" IsChecked="True" VerticalAlignment="Center" Margin="5,0" Foreground="{StaticResource DefaultTextBrush}"/>
                             <RadioButton Name="StandardSpeedRadioButton" Content="Standard Speed" GroupName="TestRunSpeedMode" VerticalAlignment="Center" Margin="5,0" Foreground="{StaticResource DefaultTextBrush}"/>
                         </StackPanel>
@@ -141,9 +145,9 @@
 
         <!-- Modbus Panel -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5" Background="{StaticResource PanelBackgroundBrush}">
-            <Label Content="Modbus IP:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+            <Label x:Name="ModbusIpLabel" Content="Modbus IP:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
             <TextBox Name="ModbusIpAddressTextBox" Width="100" VerticalAlignment="Center" Text="127.0.0.1" Margin="0,0,10,0"/>
-            <Label Content="Port:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
+            <Label x:Name="ModbusPortLabel" Content="Port:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
             <TextBox Name="ModbusPortTextBox" Width="40" VerticalAlignment="Center" Text="502" Margin="0,0,10,0"/>
             <Button Content="Connect" Name="ModbusConnectButton" Click="ModbusConnectButton_Click" Margin="5,0,5,0" Padding="5"/>
             <Button Content="Disconnect" Name="ModbusDisconnectButton" Click="ModbusDisconnectButton_Click" Margin="0,0,5,0" Padding="5" IsEnabled="False"/>
