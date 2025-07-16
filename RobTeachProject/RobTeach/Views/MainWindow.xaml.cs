@@ -204,6 +204,18 @@ namespace RobTeach.Views
             UpdateSelectedTrajectoryDetailUI(); // Initial call (renamed)
             RefreshCadCanvasHighlights(); // Initial call for canvas highlights
             LanguageComboBox.SelectionChanged += LanguageComboBox_SelectionChanged;
+            if (_currentConfiguration != null)
+            {
+                if (_currentConfiguration.Language == "中文")
+                {
+                    LanguageComboBox.SelectedIndex = 1;
+                }
+                else
+                {
+                    LanguageComboBox.SelectedIndex = 0;
+                }
+                UpdateUIText(_currentConfiguration.Language);
+            }
         }
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
