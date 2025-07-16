@@ -151,15 +151,17 @@ namespace RobTeach.Services
                     if (pointsInCurrentTraj > 0)
                     {
                     // Convert trajectory points (doubles) to floats and then to integer arrays for Modbus registers.
-                    float[] xCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (float)p.X).ToArray();
-                    float[] yCoords = traj.Points.Take(pointsInCurrentTraj).Select(p => (float)p.Y).ToArray();
+                    for (int j = 0; j < pointsInCurrentTraj; j++)
+                    {
+                        float x = (float)traj.Points[j].X;
+                        float y = (float)traj.Points[j].Y;
 
-                        // Calculate base registers for X and Y coordinates of the current trajectory.
-                        int currentTrajBaseXReg = BaseXCoordsRegister + (i * TrajectoryRegisterOffset);
-                    modbusClient.WriteMultipleRegisters(currentTrajBaseXReg, ModbusClient.ConvertFloatToRegisters(xCoords));
+                        int[] xRegs = ModbusClient.ConvertFloatToRegisters(x);
+                        int[] yRegs = ModbusClient.ConvertFloatToRegisters(y);
 
-                        int currentTrajBaseYReg = BaseYCoordsRegister + (i * TrajectoryRegisterOffset);
-                    modbusClient.WriteMultipleRegisters(currentTrajBaseYReg, ModbusClient.ConvertFloatToRegisters(yCoords));
+                        modbusClient.WriteMultipleRegisters(BaseXCoordsRegister + (i * TrajectoryRegisterOffset) + (j * 2), xRegs);
+                        modbusClient.WriteMultipleRegisters(BaseYCoordsRegister + (i * TrajectoryRegisterOffset) + (j * 2), yRegs);
+                    }
                     }
 
                     // Write nozzle number for the current trajectory.
