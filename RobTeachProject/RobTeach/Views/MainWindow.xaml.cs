@@ -3967,24 +3967,24 @@ namespace RobTeach.Views
             return Rect.Empty;
         }
 
-        private void WritePointData(StreamWriter writer, DxfPoint point, int address, float rx = 0f, float ry = 0f, float rz = 0f)
+        private void WritePointData(StreamWriter writer, DxfPoint point, ref int address, float rx = 0f, float ry = 0f, float rz = 0f)
         {
-            writer.WriteLine($"{((float)point.X).ToString("F3")}  (Address: {address})");
-            writer.WriteLine($"{((float)point.Y).ToString("F3")}  (Address: {address + 2})");
-            writer.WriteLine($"{((float)point.Z).ToString("F3")}  (Address: {address + 4})");
-            writer.WriteLine($"{rx.ToString("F3")}  (Address: {address + 6})");
-            writer.WriteLine($"{ry.ToString("F3")}  (Address: {address + 8})");
-            writer.WriteLine($"{rz.ToString("F3")}  (Address: {address + 10})");
+            writer.WriteLine($"{((float)point.X).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Y).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Z).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{rx.ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{ry.ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{rz.ToString("F3")}  (Address: {address})"); address += 2;
         }
 
-        private void WriteTrajectoryPointWithAnglesData(StreamWriter writer, TrajectoryPointWithAngles point, int address)
+        private void WriteTrajectoryPointWithAnglesData(StreamWriter writer, TrajectoryPointWithAngles point, ref int address)
         {
-            writer.WriteLine($"{((float)point.Coordinates.X).ToString("F3")}  (Address: {address})");
-            writer.WriteLine($"{((float)point.Coordinates.Y).ToString("F3")}  (Address: {address + 2})");
-            writer.WriteLine($"{((float)point.Coordinates.Z).ToString("F3")}  (Address: {address + 4})");
-            writer.WriteLine($"{((float)point.Rx).ToString("F3")}  (Address: {address + 6})");
-            writer.WriteLine($"{((float)point.Ry).ToString("F3")}  (Address: {address + 8})");
-            writer.WriteLine($"{((float)point.Rz).ToString("F3")}  (Address: {address + 10})");
+            writer.WriteLine($"{((float)point.Coordinates.X).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Coordinates.Y).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Coordinates.Z).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Rx).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Ry).ToString("F3")}  (Address: {address})"); address += 2;
+            writer.WriteLine($"{((float)point.Rz).ToString("F3")}  (Address: {address})"); address += 2;
         }
 
 
@@ -4004,8 +4004,10 @@ namespace RobTeach.Views
 
             using (StreamWriter writer = new StreamWriter(dataFilePath))
             {
+                int currentAddress = 4000;
                 // 1. Total Number of Passes
-                writer.WriteLine(((float)config.SprayPasses.Count).ToString("F3"));
+                writer.WriteLine($"{((float)config.SprayPasses.Count).ToString("F3")}  (Address: {currentAddress})");
+                currentAddress++;
 
                 int passIndex = 0;
                 foreach (var pass in config.SprayPasses)
@@ -4014,7 +4016,8 @@ namespace RobTeach.Views
 
                     // 2.a. Number of Primitives in Pass
                     int totalPrimitives = pass.Trajectories.Sum(t => t.PrimitiveType == "Polygon" ? (t.Points.Count - ((t.OriginalDxfEntity as DxfLwPolyline)?.IsClosed ?? false ? 0 : 1)) : 1);
-                    writer.WriteLine(((float)totalPrimitives).ToString("F3"));
+                    writer.WriteLine($"{((float)totalPrimitives).ToString("F3")}  (Address: {currentAddress})");
+                    currentAddress++;
 
                     int primitiveIndexInPass = 0;
                     foreach (var trajectory in pass.Trajectories)
@@ -4023,26 +4026,26 @@ namespace RobTeach.Views
                         {
                             primitiveIndexInPass++;
                             // 2.b.i. Primitive Index
-                            writer.WriteLine(((float)primitiveIndexInPass).ToString("F3"));
+                            writer.WriteLine($"{((float)primitiveIndexInPass).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
 
                             // 2.b.ii. Primitive Type
                             float primitiveType = 0.0f;
                             if (trajectory.PrimitiveType == "Line") primitiveType = 1.0f;
                             else if (trajectory.PrimitiveType == "Circle") primitiveType = 2.0f;
                             else if (trajectory.PrimitiveType == "Arc") primitiveType = 3.0f;
-                            writer.WriteLine(primitiveType.ToString("F3"));
+                            writer.WriteLine($"{primitiveType.ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
                         }
 
                         if (trajectory.PrimitiveType != "Polygon")
                         {
                             // 2.b.iii. Upper Nozzle Gas
-                            writer.WriteLine((trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3"));
+                            writer.WriteLine($"{(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
                             // 2.b.iv. Upper Nozzle Liquid
-                            writer.WriteLine((trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3"));
+                            writer.WriteLine($"{(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
                             // 2.b.v. Lower Nozzle Gas
-                            writer.WriteLine((trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3"));
+                            writer.WriteLine($"{(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
                             // 2.b.vi. Lower Nozzle Liquid
-                            writer.WriteLine((trajectory.LowerNozzleLiquidOn ? 22.0f : 20.0f).ToString("F3"));
+                            writer.WriteLine($"{(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
 
                             // 2.b.vii. End Effector Speed (Calculated: Length / Runtime)
                             double lengthInMeters = TrajectoryUtils.CalculateTrajectoryLength(trajectory);
@@ -4058,28 +4061,28 @@ namespace RobTeach.Views
                                 // Else: runtime is zero/tiny, length is not. Speed remains 0.0f (implying problem or stop)
                             }
                             // Else: length is zero/tiny. Speed remains 0.0f.
-                            writer.WriteLine(speedForRobot.ToString("F3"));
+                            writer.WriteLine($"{speedForRobot.ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
                         }
 
                         // 2.b.viii. Primitive Geometry Data
                         if (trajectory.PrimitiveType == "Line")
                         {
-                            WritePointData(writer, trajectory.LineStartPoint, 4000 + (primitiveIndexInPass - 1) * 100 + 8);
-                            WritePointData(writer, trajectory.LineEndPoint, 4000 + (primitiveIndexInPass - 1) * 100 + 20);
+                            WritePointData(writer, trajectory.LineStartPoint, ref currentAddress);
+                            WritePointData(writer, trajectory.LineEndPoint, ref currentAddress);
                         }
                         else if (trajectory.PrimitiveType == "Arc")
                         {
                             if (trajectory.ArcPoint1 == null || trajectory.ArcPoint2 == null || trajectory.ArcPoint3 == null)
                             {
                                 // Write placeholder zeros if arc points are somehow null
-                                for (int i = 0; i < 3 * 6; i++) writer.WriteLine(0.0f.ToString("F3")); // 3 points * 6 floats
+                                for (int i = 0; i < 3 * 6; i++) { writer.WriteLine(0.0f.ToString("F3")); currentAddress++; }
                             }
                             else
                             {
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint1, 4000 + (primitiveIndexInPass - 1) * 100 + 8);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint1, ref currentAddress);
                                 // The second point for an Arc is ArcPoint2 (midpoint on circumference)
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint2, 4000 + (primitiveIndexInPass - 1) * 100 + 20);
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint3, 4000 + (primitiveIndexInPass - 1) * 100 + 32);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint2, ref currentAddress);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.ArcPoint3, ref currentAddress);
                             }
                         }
                         else if (trajectory.PrimitiveType == "Circle")
@@ -4087,14 +4090,14 @@ namespace RobTeach.Views
                             if (trajectory.CirclePoint1 == null || trajectory.OriginalCircleCenter == null || trajectory.CirclePoint3 == null)
                             {
                                 // Write placeholder zeros if circle points are somehow null
-                                for (int i = 0; i < 3 * 6; i++) writer.WriteLine(0.0f.ToString("F3")); // 3 points * 6 floats
+                                for (int i = 0; i < 3 * 6; i++) { writer.WriteLine(0.0f.ToString("F3")); currentAddress++; }
                             }
                             else
                             {
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint1, 4000 + (primitiveIndexInPass - 1) * 100 + 8);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint1, ref currentAddress);
                                 // The second point for a Circle is CirclePoint2 (a point on circumference)
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint2, 4000 + (primitiveIndexInPass - 1) * 100 + 20);
-                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint3, 4000 + (primitiveIndexInPass - 1) * 100 + 32);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint2, ref currentAddress);
+                                WriteTrajectoryPointWithAnglesData(writer, trajectory.CirclePoint3, ref currentAddress);
                             }
                         }
                         else if (trajectory.PrimitiveType == "Polygon")
@@ -4105,57 +4108,57 @@ namespace RobTeach.Views
                             for (int i = 0; i < trajectory.Points.Count - 1; i++)
                             {
                                 primitiveIndexInPass++;
-                                writer.WriteLine($"{((float)primitiveIndexInPass).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100})");
-                                writer.WriteLine($"{(1.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 1})");
-                                writer.WriteLine($"{(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 2})");
-                                writer.WriteLine($"{(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 3})");
-                                writer.WriteLine($"{(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 4})");
-                                writer.WriteLine($"{(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 5})");
-                                writer.WriteLine($"{speed.ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 6})");
+                                writer.WriteLine($"{((float)primitiveIndexInPass).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(1.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{speed.ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
 
                                 Point3D p1 = trajectory.Points[i];
                                 Point3D p2 = trajectory.Points[i + 1];
-                                WritePointData(writer, new DxfPoint(p1.X, p1.Y, p1.Z), 4000 + (primitiveIndexInPass - 1) * 100 + 8);
-                                WritePointData(writer, new DxfPoint(p2.X, p2.Y, p2.Z), 4000 + (primitiveIndexInPass - 1) * 100 + 20);
+                                WritePointData(writer, new DxfPoint(p1.X, p1.Y, p1.Z), ref currentAddress);
+                                WritePointData(writer, new DxfPoint(p2.X, p2.Y, p2.Z), ref currentAddress);
 
-                                writer.WriteLine(0.0f.ToString("F3"));
-                                writer.WriteLine(0.0f.ToString("F3"));
-                                writer.WriteLine(0.0f.ToString("F3"));
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
                             }
 
                             if (trajectory.OriginalDxfEntity is DxfLwPolyline polyline && polyline.IsClosed && trajectory.Points.Count > 2)
                             {
                                 primitiveIndexInPass++;
-                                writer.WriteLine($"{((float)primitiveIndexInPass).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100})");
-                                writer.WriteLine($"{(1.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 1})");
-                                writer.WriteLine($"{(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 2})");
-                                writer.WriteLine($"{(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 3})");
-                                writer.WriteLine($"{(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 4})");
-                                writer.WriteLine($"{(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f).ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 5})");
-                                writer.WriteLine($"{speed.ToString("F3")}  (Address: {4000 + (primitiveIndexInPass - 1) * 100 + 6})");
+                                writer.WriteLine($"{((float)primitiveIndexInPass).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(1.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f).ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
+                                writer.WriteLine($"{speed.ToString("F3")}  (Address: {currentAddress})"); currentAddress++;
 
                                 Point3D p1 = trajectory.Points[trajectory.Points.Count - 1];
                                 Point3D p2 = trajectory.Points[0];
-                                WritePointData(writer, new DxfPoint(p1.X, p1.Y, p1.Z), 4000 + (primitiveIndexInPass - 1) * 100 + 8);
-                                WritePointData(writer, new DxfPoint(p2.X, p2.Y, p2.Z), 4000 + (primitiveIndexInPass - 1) * 100 + 20);
+                                WritePointData(writer, new DxfPoint(p1.X, p1.Y, p1.Z), ref currentAddress);
+                                WritePointData(writer, new DxfPoint(p2.X, p2.Y, p2.Z), ref currentAddress);
 
-                                writer.WriteLine(0.0f.ToString("F3"));
-                                writer.WriteLine(0.0f.ToString("F3"));
-                                writer.WriteLine(0.0f.ToString("F3"));
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                                writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
                             }
                         }
                         else // Unknown primitive type
                         {
                             // Write placeholder zeros for geometry
-                             for(int i=0; i < 2 * 6; i++) writer.WriteLine(0.0f.ToString("F3")); // Default to 2 points * 6 floats like a line
+                            for (int i = 0; i < 2 * 6; i++) { writer.WriteLine(0.0f.ToString("F3")); currentAddress++; }
                         }
 
                         if (trajectory.PrimitiveType != "Polygon")
                         {
                             // 2.b.ix. Reserved Values
-                            writer.WriteLine(0.0f.ToString("F3"));
-                            writer.WriteLine(0.0f.ToString("F3"));
-                            writer.WriteLine(0.0f.ToString("F3"));
+                            writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                            writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
+                            writer.WriteLine(0.0f.ToString("F3")); currentAddress++;
                         }
                     }
 
