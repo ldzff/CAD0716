@@ -624,7 +624,7 @@ namespace RobTeach.Views
 
                 var newIndicator = new DirectionIndicator
                 {
-                    Color = (trajectoryInLoop == actuallySelectedItem) ? SelectedStrokeBrush : DefaultStrokeBrush,
+                    Color = (trajectoryInLoop == actuallySelectedItem) ? CurrentSelectionStrokeBrush : SelectedStrokeBrush,
                     ArrowheadSize = 8 * scale,
                     StrokeThickness = 1.5 * scale
                 };
