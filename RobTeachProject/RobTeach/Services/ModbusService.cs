@@ -23,12 +23,12 @@ namespace RobTeach.Services
 
         // Define Modbus register addresses based on the application's README or device specification.
         // These constants define the memory map on the Modbus server (robot).
-        private const int TrajectoryCountRegister = 1000;   // Register to write the number of trajectories being sent.
-        private const int BasePointsCountRegister = 1001;   // Base register for the point count of the first trajectory.
-        private const int BaseXCoordsRegister = 1002;       // Base register for X coordinates of the first trajectory.
-        private const int BaseYCoordsRegister = 1052;       // Base register for Y coordinates of the first trajectory.
-        private const int BaseNozzleNumRegister = 1102;     // Base register for nozzle number of the first trajectory.
-        private const int BaseSprayTypeRegister = 1103;     // Base register for spray type of the first trajectory.
+        private const int TrajectoryCountRegister = 3000;   // Register to write the number of trajectories being sent.
+        private const int BasePointsCountRegister = 3001;   // Base register for the point count of the first trajectory.
+        private const int BaseXCoordsRegister = 3002;       // Base register for X coordinates of the first trajectory.
+        private const int BaseYCoordsRegister = 3052;       // Base register for Y coordinates of the first trajectory.
+        private const int BaseNozzleNumRegister = 3102;     // Base register for nozzle number of the first trajectory.
+        private const int BaseSprayTypeRegister = 3103;     // Base register for spray type of the first trajectory.
 
         private const int TrajectoryRegisterOffset = 100;   // Offset between base registers of consecutive trajectories.
         private const int MaxPointsPerTrajectory = 50;      // Maximum number of points per trajectory supported by the robot.
