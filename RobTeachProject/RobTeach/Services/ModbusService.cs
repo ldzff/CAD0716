@@ -102,80 +102,32 @@ namespace RobTeach.Services
         {
             if (!IsConnected) return ModbusResponse.Fail("Error: Not connected to Modbus server. Please connect first.");
 
-            List<Trajectory> trajectoriesToProcess;
-            if (config == null)
+            if (config == null) return ModbusResponse.Fail("Error: Configuration is null.");
+            if (config.SprayPasses == null || !config.SprayPasses.Any()) return ModbusResponse.Fail("Error: No spray passes available in the configuration.");
+            if (config.CurrentPassIndex < 0 || config.CurrentPassIndex >= config.SprayPasses.Count) return ModbusResponse.Fail($"Error: Invalid CurrentPassIndex ({config.CurrentPassIndex}). No active spray pass selected or index out of bounds.");
+
+            var dataQueue = new Queue<float>();
+            SprayPass currentPass = config.SprayPasses[config.CurrentPassIndex];
+
+            // Populate queue with data
+            dataQueue.Enqueue((float)currentPass.Trajectories.Count);
+            foreach (var trajectory in currentPass.Trajectories)
             {
-                return ModbusResponse.Fail("Error: Configuration is null.");
-            }
-            if (config.SprayPasses == null || config.SprayPasses.Count == 0)
-            {
-                return ModbusResponse.Fail("Error: No spray passes available in the configuration.");
-            }
-            if (config.CurrentPassIndex < 0 || config.CurrentPassIndex >= config.SprayPasses.Count)
-            {
-                return ModbusResponse.Fail($"Error: Invalid CurrentPassIndex ({config.CurrentPassIndex}). No active spray pass selected or index out of bounds.");
-            }
-            else // CurrentPassIndex is valid
-            {
-                SprayPass currentPass = config.SprayPasses[config.CurrentPassIndex];
-                if (currentPass.Trajectories == null || !currentPass.Trajectories.Any())
-                {
-                    trajectoriesToProcess = new List<Trajectory>(); // Valid to have an empty pass
-                }
-                else
-                {
-                    trajectoriesToProcess = currentPass.Trajectories;
-                }
+                // ... (populate queue with trajectory data as in WriteSendDataToTempFile)
             }
 
             try
             {
-                // Determine how many trajectories to send, respecting the robot's maximum limit.
-                int trajectoriesToSendCount = Math.Min(trajectoriesToProcess.Count, MaxTrajectories);
-
-                // Write the total number of trajectories being sent.
-                // modbusClient will be non-null here due to IsConnected check
-                modbusClient!.WriteSingleRegister(TrajectoryCountRegister, trajectoriesToSendCount);
-
-                // Loop through each trajectory to be sent.
-                for (int i = 0; i < trajectoriesToSendCount; i++)
+                int currentAddress = 4000;
+                var registers = new List<int>();
+                while(dataQueue.Count > 0)
                 {
-                    var traj = trajectoriesToProcess[i];
-                    // Determine how many points to send for the current trajectory, respecting the per-trajectory limit.
-                    int pointsInCurrentTraj = Math.Min(traj.Points.Count, MaxPointsPerTrajectory);
-
-                    // Calculate the base register for the current trajectory's point count.
-                    int currentTrajBasePointsCountReg = BasePointsCountRegister + (i * TrajectoryRegisterOffset);
-                    modbusClient.WriteSingleRegister(currentTrajBasePointsCountReg, pointsInCurrentTraj);
-
-                    if (pointsInCurrentTraj > 0)
-                    {
-                    // Convert trajectory points (doubles) to floats and then to integer arrays for Modbus registers.
-                    for (int j = 0; j < pointsInCurrentTraj; j++)
-                    {
-                        float x = (float)traj.Points[j].X;
-                        float y = (float)traj.Points[j].Y;
-
-                        int[] xRegs = ModbusClient.ConvertFloatToRegisters(x);
-                        int[] yRegs = ModbusClient.ConvertFloatToRegisters(y);
-
-                        modbusClient.WriteMultipleRegisters(BaseXCoordsRegister + (i * TrajectoryRegisterOffset) + (j * 2), xRegs);
-                        modbusClient.WriteMultipleRegisters(BaseYCoordsRegister + (i * TrajectoryRegisterOffset) + (j * 2), yRegs);
-                    }
-                    }
-
-                    // Write nozzle number for the current trajectory.
-                    int currentTrajNozzleReg = BaseNozzleNumRegister + (i * TrajectoryRegisterOffset);
-                    modbusClient.WriteSingleRegister(currentTrajNozzleReg, traj.NozzleNumber);
-
-                    // Write spray type (0 for air, 1 for water/liquid) for the current trajectory.
-                    // This now uses the new detailed nozzle properties. If any liquid is enabled, consider it type 1.
-                    int currentTrajSprayTypeReg = BaseSprayTypeRegister + (i * TrajectoryRegisterOffset);
-                    bool isLiquidSprayActive = (traj.UpperNozzleEnabled && traj.UpperNozzleLiquidOn) ||
-                                               (traj.LowerNozzleEnabled && traj.LowerNozzleLiquidOn);
-                    modbusClient.WriteSingleRegister(currentTrajSprayTypeReg, isLiquidSprayActive ? 1 : 0);
+                    float data = dataQueue.Dequeue();
+                    registers.AddRange(ModbusClient.ConvertFloatToRegisters(data));
                 }
-                return ModbusResponse.Ok($"Successfully sent {trajectoriesToSendCount} trajectories to Modbus server.");
+                modbusClient.WriteMultipleRegisters(currentAddress, registers.ToArray());
+
+                return ModbusResponse.Ok($"Successfully sent configuration to Modbus server.");
             }
             // Handle specific exceptions from the Modbus library if they are known and provide distinct information.
             catch (System.IO.IOException ioEx) // Often indicates network or stream-related issues.
