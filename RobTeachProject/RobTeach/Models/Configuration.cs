@@ -62,7 +62,7 @@ namespace RobTeach.Models
         /// the entire set of trajectories.
         /// </summary>
         public Transform TransformParameters { get; set; } = new Transform();
-        public string Language { get; set; } = "English";
+        public string Language { get; set; } = "中文";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Configuration"/> class.
