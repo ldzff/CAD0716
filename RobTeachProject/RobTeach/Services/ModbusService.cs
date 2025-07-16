@@ -125,7 +125,10 @@ namespace RobTeach.Services
                     float data = dataQueue.Dequeue();
                     registers.AddRange(ModbusClient.ConvertFloatToRegisters(data));
                 }
-                modbusClient.WriteMultipleRegisters(currentAddress, registers.ToArray());
+                if (registers.Count > 0)
+                {
+                    modbusClient.WriteMultipleRegisters(currentAddress, registers.ToArray());
+                }
 
                 return ModbusResponse.Ok($"Successfully sent configuration to Modbus server.");
             }
