@@ -1,5 +1,6 @@
 using EasyModbus;
 using RobTeach.Models;
+using RobTeach.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
