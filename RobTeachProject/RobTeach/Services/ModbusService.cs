@@ -111,31 +111,105 @@ namespace RobTeach.Services
             SprayPass currentPass = config.SprayPasses[config.CurrentPassIndex];
 
             // Populate queue with data
-            dataQueue.Enqueue((float)currentPass.Trajectories.Count);
-            foreach (var trajectory in currentPass.Trajectories)
+            dataQueue.Enqueue((float)config.SprayPasses.Count);
+
+            foreach (var pass in config.SprayPasses)
             {
-                dataQueue.Enqueue((float)trajectory.Points.Count);
-                foreach (var point in trajectory.Points)
+                int totalPrimitives = pass.Trajectories.Sum(t => t.PrimitiveType == "Polygon" ? (t.Points.Count - ((t.OriginalDxfEntity as DxfLwPolyline)?.IsClosed ?? false ? 0 : 1)) : 1);
+                dataQueue.Enqueue((float)totalPrimitives);
+
+                int primitiveIndexInPass = 0;
+                foreach (var trajectory in pass.Trajectories)
                 {
-                    dataQueue.Enqueue((float)point.X);
-                    dataQueue.Enqueue((float)point.Y);
-                    dataQueue.Enqueue((float)point.Z);
-                    dataQueue.Enqueue(0f); // Rx
-                    dataQueue.Enqueue(0f); // Ry
-                    dataQueue.Enqueue(0f); // Rz
+                    if (trajectory.PrimitiveType != "Polygon")
+                    {
+                        primitiveIndexInPass++;
+                        dataQueue.Enqueue((float)primitiveIndexInPass);
+
+                        float primitiveType = 0.0f;
+                        if (trajectory.PrimitiveType == "Line") primitiveType = 1.0f;
+                        else if (trajectory.PrimitiveType == "Circle") primitiveType = 2.0f;
+                        else if (trajectory.PrimitiveType == "Arc") primitiveType = 3.0f;
+                        dataQueue.Enqueue(primitiveType);
+                    }
+
+                    if (trajectory.PrimitiveType != "Polygon")
+                    {
+                        dataQueue.Enqueue(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f);
+                        dataQueue.Enqueue(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f);
+                        dataQueue.Enqueue(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f);
+                        dataQueue.Enqueue(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f);
+
+                        double lengthInMeters = TrajectoryUtils.CalculateTrajectoryLength(trajectory);
+                        double currentRuntime = trajectory.Runtime;
+                        float speedForRobot = 0.0f;
+
+                        if (lengthInMeters > 0.00001 && currentRuntime > 0.00001)
+                        {
+                            speedForRobot = (float)(lengthInMeters / currentRuntime);
+                        }
+                        dataQueue.Enqueue(speedForRobot);
+                    }
+
+                    if (trajectory.PrimitiveType == "Line")
+                    {
+                        dataQueue.Enqueue((float)trajectory.LineStartPoint.X);
+                        dataQueue.Enqueue((float)trajectory.LineStartPoint.Y);
+                        dataQueue.Enqueue((float)trajectory.LineStartPoint.Z);
+                        dataQueue.Enqueue(0f); dataQueue.Enqueue(0f); dataQueue.Enqueue(0f);
+                        dataQueue.Enqueue((float)trajectory.LineEndPoint.X);
+                        dataQueue.Enqueue((float)trajectory.LineEndPoint.Y);
+                        dataQueue.Enqueue((float)trajectory.LineEndPoint.Z);
+                        dataQueue.Enqueue(0f); dataQueue.Enqueue(0f); dataQueue.Enqueue(0f);
+                    }
+                    else if (trajectory.PrimitiveType == "Arc")
+                    {
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Rx);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Ry);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint1.Rz);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Rx);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Ry);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint2.Rz);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Rx);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Ry);
+                        dataQueue.Enqueue((float)trajectory.ArcPoint3.Rz);
+                    }
+                    else if (trajectory.PrimitiveType == "Circle")
+                    {
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Rx);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Ry);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint1.Rz);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Rx);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Ry);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint2.Rz);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Coordinates.X);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Coordinates.Y);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Coordinates.Z);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Rx);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Ry);
+                        dataQueue.Enqueue((float)trajectory.CirclePoint3.Rz);
+                    }
+
+                    if (trajectory.PrimitiveType != "Polygon")
+                    {
+                        for (int j = 0; j < 3; j++) dataQueue.Enqueue(0.0f);
+                    }
                 }
-                dataQueue.Enqueue(trajectory.UpperNozzleGasOn ? 11.0f : 10.0f);
-                dataQueue.Enqueue(trajectory.UpperNozzleLiquidOn ? 12.0f : 10.0f);
-                dataQueue.Enqueue(trajectory.LowerNozzleGasOn ? 21.0f : 20.0f);
-                dataQueue.Enqueue(trajectory.LowerNozzleLiquidOn ? 22.0f : 10.0f);
-                double lengthInMeters = TrajectoryUtils.CalculateTrajectoryLength(trajectory);
-                double currentRuntime = trajectory.Runtime;
-                float speedForRobot = 0.0f;
-                if (lengthInMeters > 0.00001 && currentRuntime > 0.00001)
-                {
-                    speedForRobot = (float)(lengthInMeters / currentRuntime);
-                }
-                dataQueue.Enqueue(speedForRobot);
             }
 
             try
