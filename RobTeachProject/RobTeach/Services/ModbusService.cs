@@ -224,7 +224,12 @@ namespace RobTeach.Services
                 }
                 if (registers.Count > 0)
                 {
-                    modbusClient.WriteMultipleRegisters(currentAddress, registers.ToArray());
+                    const int chunkSize = 100; // Send 100 registers at a time
+                    for (int i = 0; i < registers.Count; i += chunkSize)
+                    {
+                        var chunk = registers.Skip(i).Take(chunkSize).ToArray();
+                        modbusClient.WriteMultipleRegisters(currentAddress + i, chunk);
+                    }
                 }
 
                 return ModbusResponse.Ok($"Successfully sent configuration to Modbus server.");
